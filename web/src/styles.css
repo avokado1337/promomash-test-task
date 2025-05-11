@@ -1,0 +1,22 @@
+/* Главный фон для страницы */
+body {
+    background-color: #0d3621;
+    /* Более темный военный оттенок */
+    font-family: 'Creepster', sans-serif;
+    color: #f0f0f0;
+    /* Можно сделать цвет текста более светлым, если фон темный */
+}
+
+/* Фон для формы */
+.registration-container {
+    background-color: rgba(7, 39, 12, 0.8);
+    /* Тот же темный, но с прозрачностью, чтобы он не был таким тяжелым */
+}
+
+/* Если нужно сделать текст в форме светлее */
+.registration-container,
+mat-form-field,
+mat-checkbox {
+    color: #f0f0f0;
+    /* Светлый цвет для текста */
+}

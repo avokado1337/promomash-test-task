@@ -1,0 +1,131 @@
+<div class="aquila-banner">
+    <img src="imperial-aquila.png" alt="Imperial Aquila" />
+</div>
+
+<mat-horizontal-stepper [linear]="true" #stepper>
+    <!-- Step 1 -->
+    <mat-step [stepControl]="step1" label="Данные новобранца">
+        <form [formGroup]="step1" (ngSubmit)="onSubmitStep1(stepper)">
+            <h2>Добро пожаловать, рекрут!</h2>
+            <h3>Введи свои данные для обработки техножрецами!</h3>
+
+            <!-- Email -->
+            <mat-form-field appearance="outline">
+                <mat-label>Уникальный адрес вокс-передатчика</mat-label>
+                <input matInput formControlName="voxAddress" type="email" />
+                <mat-error
+                    *ngIf="shouldShowError('step1', 'voxAddress') && step1.get('voxAddress')?.hasError('required')">
+                    Обязательно для заполнения
+                </mat-error>
+                <mat-error *ngIf="shouldShowError('step1', 'voxAddress') && step1.get('voxAddress')?.hasError('email')">
+                    Ересь! Адрес вашего вокс-передатчика не соответствует правилам!
+                </mat-error> </mat-form-field>
+
+            <!-- Password -->
+            <mat-form-field appearance="outline">
+                <mat-label>Шифр</mat-label>
+                <input matInput type="password" formControlName="password" />
+                <mat-error *ngIf="shouldShowError('step1', 'password') && step1.get('password')?.hasError('required')">
+                    Обязательно для заполнения
+                </mat-error>
+                <mat-error
+                    *ngIf="shouldShowError('step1', 'password') && step1.get('password')?.hasError('weakPassword')">
+                    У вас слабый шифр! Враги Империума не дремлят!
+                </mat-error> </mat-form-field>
+
+            <!-- Confirm Password -->
+            <mat-form-field appearance="outline">
+                <mat-label>Подтвердите шифр</mat-label>
+                <input matInput type="password" formControlName="confirmPassword" />
+                <mat-error
+                    *ngIf="shouldShowError('step1', 'confirmPassword') && step1.get('confirmPassword')?.hasError('required')">
+                    Обязательно для заполнения
+                </mat-error>
+                <mat-error
+                    *ngIf="shouldShowError('step1', 'confirmPassword') && step1.hasError('passwordsNotMatching')">
+                    Шифры не совпадают! Исправьте или ответьте перед комиссаром!
+                </mat-error>
+            </mat-form-field>
+
+            <!-- Agree Checkbox -->
+            <mat-checkbox formControlName="agree">
+                Я присягаю своей полной и безраздельной преданностью Императору. Я принимаю на себя бремя служения в Его
+                бескрайней Империи и обязуюсь хранить доверенные мне рубежи человечества. Я также признаю свою
+                обязанность защищать эти территории и, как часть этой миссии, обязуюсь сражаться в тех армиях и флотах,
+                которые необходимы для исполнения воли Императора.
+            </mat-checkbox>
+            <mat-error *ngIf="shouldShowError('step1', 'agree') && step1.get('agree')?.hasError('required')">
+                Клятва обязательна, новобранец!
+            </mat-error>
+            <!-- Button -->
+            <div class="button-row">
+                <button mat-raised-button color="primary" (click)="onSubmitStep1(stepper)">
+                    Подтвердить и выбрать систему откуда вы родом
+                </button>
+            </div>
+        </form>
+    </mat-step>
+
+    <!-- Step 2 -->
+    <mat-step [stepControl]="step2" label="Данные о родном мире новобранца">
+        <form [formGroup]="step2">
+            <h2>Данные о родном мире новобранца</h2>
+            <p class="step-description">
+                Укажите свой сегментум, систему и родной мир для выбора подходящего имперского полка!
+            </p>
+
+            <!-- Segment Dropdown -->
+            <mat-form-field appearance="outline">
+                <mat-label>Сегментум</mat-label>
+                <mat-select formControlName="segmentId" (selectionChange)="onSegmentChange()">
+                    <mat-option *ngFor="let segment of segments" [value]="segment.id">
+                        {{ segment.name }}
+                    </mat-option>
+                </mat-select>
+                <mat-error
+                    *ngIf="shouldShowError('step2', 'segmentId') && step2.get('segmentId')?.hasError('required')">
+                    Сегментум обязателен для заполнения!
+                </mat-error>
+            </mat-form-field>
+
+            <!-- System Dropdown -->
+            <mat-form-field appearance="outline">
+                <mat-label>Система</mat-label>
+                <mat-select formControlName="systemId" (selectionChange)="onSystemChange()"
+                    [disabled]="!systems.length">
+                    <mat-option *ngFor="let system of systems" [value]="system.id">
+                        {{ system.name }}
+                    </mat-option>
+                </mat-select>
+                <mat-error *ngIf="shouldShowError('step2', 'systemId') && step2.get('systemId')?.hasError('required')">
+                    Система обязательна для заполнения!
+                </mat-error>
+            </mat-form-field>
+
+            <!-- Planet Dropdown -->
+            <mat-form-field appearance="outline">
+                <mat-label>Родной мир</mat-label>
+                <mat-select formControlName="planetId" [disabled]="!planets.length">
+                    <mat-option *ngFor="let planet of planets" [value]="planet.id">
+                        {{ planet.name }}
+                    </mat-option>
+                </mat-select>
+                <mat-error *ngIf="shouldShowError('step2', 'planetId') && step2.get('planetId')?.hasError('required')">
+                    Родной мир обязателен для заполнения! Даже если он был уничтожен!
+                </mat-error>
+            </mat-form-field>
+
+            <!-- Buttons -->
+            <div class="button-row">
+                <button mat-stroked-button color="basic" (click)="prevStep(stepper)">
+                    <mat-icon>arrow_back</mat-icon> BACK
+                </button>
+                <button mat-raised-button color="warn" (click)="onSubmitStep2()">
+                    <span *ngIf="!isLoading">Записаться в имперский полк</span>
+                    <span *ngIf="isLoading">Загрузка данных духам машины...</span>
+                    <mat-icon>send</mat-icon>
+                </button>
+            </div>
+        </form>
+    </mat-step>
+</mat-horizontal-stepper>
